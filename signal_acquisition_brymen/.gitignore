@@ -1,0 +1,6 @@
+﻿ .vs/
+ signal_acquisition_brymen.sln
+ signal_acquisition_brymen/bin/
+ signal_acquisition_brymen/obj/
+ signal_acquisition_brymen/signal_acquisition_brymen.csproj
+ signal_acquisition_brymen/signal_acquisition_brymen.csproj.user
