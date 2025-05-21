@@ -12,14 +12,39 @@ namespace signal_acquisition_brymen
             _port = port;
         }
 
-        public void GetVoltage()
+        public string GetVoltageDC()
         {
-            _port.WriteLine(":MEASure:VOLTage?");
+            Console.WriteLine("Voltage function");
+            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
+            _port.WriteLine(":MEASure:VOLTage:DC?");
+            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
+        }
+        public string GetVoltageAC()
+        {
+            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
+            _port.WriteLine(":MEASure:VOLTage:AC?");
+            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
         }
 
-        public void GetCurrent()
+        public string GetCurrentDC()
         {
-            _port.WriteLine(":MEASure:CURRent?");
+            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
+            _port.WriteLine(":MEASure:CURRent:DC?");
+            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
+        }
+        public string GetCurrentAC()
+        {
+            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
+            _port.WriteLine(":MEASure:CURRent:AC?");
+            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
+        }
+
+        /// bledne
+        public string GetResistance()
+        {
+            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
+            _port.WriteLine(":MEASure:RESistance?");
+            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
         }
     }
 }
