@@ -1,0 +1,19 @@
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\obj\x86\Debug\ResolveAssemblyReference.cache
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\obj\x86\Debug\Rigol_siema.Form1.resources
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\obj\x86\Debug\Rigol_siema.Properties.Resources.resources
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\obj\x86\Debug\GenerateResource.read.1.tlog
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\obj\x86\Debug\GenerateResource.write.1.tlog
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\bin\Debug\Rigol siema.exe
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\bin\Debug\Rigol siema.pdb
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\obj\x86\Debug\Rigol siema.exe
+c:\documents and settings\kib\moje dokumenty\visual studio 2010\Projects\Rigol siema\Rigol siema\obj\x86\Debug\Rigol siema.pdb
+E:\Rigol siema\Rigol siema\bin\Debug\Rigol siema.exe.config
+E:\Rigol siema\Rigol siema\bin\Debug\Rigol siema.exe
+E:\Rigol siema\Rigol siema\bin\Debug\Rigol siema.pdb
+E:\Rigol siema\Rigol siema\obj\x86\Debug\Rigol siema.csproj.AssemblyReference.cache
+E:\Rigol siema\Rigol siema\obj\x86\Debug\Rigol_siema.Form1.resources
+E:\Rigol siema\Rigol siema\obj\x86\Debug\Rigol_siema.Properties.Resources.resources
+E:\Rigol siema\Rigol siema\obj\x86\Debug\Rigol siema.csproj.GenerateResource.cache
+E:\Rigol siema\Rigol siema\obj\x86\Debug\Rigol siema.csproj.CoreCompileInputs.cache
+E:\Rigol siema\Rigol siema\obj\x86\Debug\Rigol siema.exe
+E:\Rigol siema\Rigol siema\obj\x86\Debug\Rigol siema.pdb
