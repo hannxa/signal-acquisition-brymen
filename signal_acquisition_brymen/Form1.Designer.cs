@@ -38,6 +38,7 @@
             ac_button = new Button();
             feedback_label = new Label();
             csv_button = new Button();
+            capacitance_button = new Button();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             SuspendLayout();
             // 
@@ -127,11 +128,23 @@
             csv_button.UseVisualStyleBackColor = true;
             csv_button.Click += csv_button_Click;
             // 
+            // capacitance_button
+            // 
+            capacitance_button.Location = new Point(363, 78);
+            capacitance_button.Name = "capacitance_button";
+            capacitance_button.Size = new Size(94, 29);
+            capacitance_button.TabIndex = 12;
+            capacitance_button.Text = "--||--";
+            capacitance_button.TextAlign = ContentAlignment.MiddleRight;
+            capacitance_button.UseVisualStyleBackColor = true;
+            capacitance_button.Click += capacitance_button_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(capacitance_button);
             Controls.Add(csv_button);
             Controls.Add(feedback_label);
             Controls.Add(ac_button);
@@ -159,5 +172,6 @@
         private Button ac_button;
         private Label feedback_label;
         private Button csv_button;
+        private Button capacitance_button;
     }
 }

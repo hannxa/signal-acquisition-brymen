@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Text;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -10,7 +11,8 @@ namespace signal_acquisition_brymen
         private SerialPort _serialPort;
         private RigolFunction _rigolFunction;
         List<string> resultsToFiles = new List<string>();
-        
+        StringBuilder csv = new StringBuilder();
+
         public Form1()
         {
             InitializeComponent();
@@ -40,32 +42,41 @@ namespace signal_acquisition_brymen
         private void v_button_Click_1(object sender, EventArgs e)
         {
             string value = _rigolFunction.GetVoltageDC();
-            resultsToFiles.Add("Voltage DC " + value);
-            result_label.ForeColor = Color.Black;
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            csv.AppendLine($"Voltage DC;{value};{timestamp}");
             result_label.Text = $"DC Voltage: {value:F6}";
         }
 
         private void ac_button_Click(object sender, EventArgs e)
         {
             string value = _rigolFunction.GetVoltageAC();
-            resultsToFiles.Add("Voltage AC: " + value);
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            csv.AppendLine($"Voltage AC;{value};{timestamp}");
             result_label.Text = $"DC Voltage: {value}";
         }
 
         private void I_button_Click(object sender, EventArgs e)
         {
             string value = _rigolFunction.GetCurrent();
-            resultsToFiles.Add("Current" + value);
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            csv.AppendLine($"Current;{value};{timestamp}");
             result_label.Text = $"DC current: {value}";
         }
 
         private void Ω_button_Click(object sender, EventArgs e)
         {
             string value = _rigolFunction.GetResistance();
-            resultsToFiles.Add("resistance: " + value);
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            csv.AppendLine($"Resistance;{value};{timestamp}");
             result_label.Text = $"Resistance: {value}";
         }
-
+        private void capacitance_button_Click(object sender, EventArgs e)
+        {
+            string value = _rigolFunction.GetCapacitance();
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            csv.AppendLine($"Capacitance;{value};{timestamp}");
+            result_label.Text = $"Capacitance: {value}";
+        }
         private void csv_button_Click(object sender, EventArgs e)
         {
             saving();
@@ -73,15 +84,29 @@ namespace signal_acquisition_brymen
 
         public void saving()
         {
+
+            string path = "C:\\Users\\akabe\\Desktop\\rigolProgram\\text.csv";
+            bool fileExists = File.Exists(path);
+
+
             DateTime actualdate = DateTime.Now;
             string actualdatestring = actualdate.ToString("d");
-           
-            string path = "C:\\Users\\akabe\\Desktop\\rigolProgram\\text.txt";
+
             //File.WriteAllLines(path, resultsToFiles);
-            using (StreamWriter writer = new StreamWriter(path, append: true))
+            using (StreamWriter writer = new StreamWriter(path, append: true, encoding: new UTF8Encoding(true)))
             {
-                writer.WriteLine(resultsToFiles.Last());
+                if (!fileExists)
+                {
+                    writer.WriteLine("Typ pomiaru;Wartość;Czas");
+                }
+
+                writer.Write(csv.ToString());
+                MessageBox.Show("Saved to csv!!!! <3333");
             }
+
+            csv.Clear();
         }
+
+        
     }
 }

@@ -15,20 +15,7 @@ namespace signal_acquisition_brymen
             _port = port;
         }
 
-        private string Query(string command)
-        {
-            try
-            {
-                _port.DiscardInBuffer();
-                _port.WriteLine(command);
-                System.Threading.Thread.Sleep(300); // Rigol potrzebuje czasu
-                return _port.ReadLine().Trim();
-            }
-            catch (Exception ex)
-            {
-                return $"Błąd: {ex.Message}";
-            }
-        }
+ 
 
         public string GetVoltageDC()
         {
