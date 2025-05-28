@@ -125,6 +125,7 @@
             csv_button.TabIndex = 11;
             csv_button.Text = "pobierz do CSV";
             csv_button.UseVisualStyleBackColor = true;
+            csv_button.Click += csv_button_Click;
             // 
             // Form1
             // 

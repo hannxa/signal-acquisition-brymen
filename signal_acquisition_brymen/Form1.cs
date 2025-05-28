@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace signal_acquisition_brymen
 {
@@ -8,7 +9,8 @@ namespace signal_acquisition_brymen
     {
         private SerialPort _serialPort;
         private RigolFunction _rigolFunction;
-
+        List<string> resultsToFiles = new List<string>();
+        
         public Form1()
         {
             InitializeComponent();
@@ -37,34 +39,49 @@ namespace signal_acquisition_brymen
 
         private void v_button_Click_1(object sender, EventArgs e)
         {
-            MessageBox.Show("wejscie w funkcje: "); // debug
             string value = _rigolFunction.GetVoltageDC();
-            MessageBox.Show("DC Voltage odpowiedź: " + value); // debug
-            result_label.Text = $"DC Voltage: {value}";
+            resultsToFiles.Add("Voltage DC " + value);
+            result_label.ForeColor = Color.Black;
+            result_label.Text = $"DC Voltage: {value:F6}";
         }
 
         private void ac_button_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("wejscie w funkcje: "); // debug
             string value = _rigolFunction.GetVoltageAC();
-            MessageBox.Show("DC Voltage odpowiedź: " + value); // debug
+            resultsToFiles.Add("Voltage AC: " + value);
             result_label.Text = $"DC Voltage: {value}";
         }
 
         private void I_button_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("wejscie w funkcje: "); // debug
             string value = _rigolFunction.GetCurrent();
-            MessageBox.Show("DC current odpowiedź: " + value); // debug
+            resultsToFiles.Add("Current" + value);
             result_label.Text = $"DC current: {value}";
         }
 
         private void Ω_button_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("wejscie w funkcje: "); // debug
             string value = _rigolFunction.GetResistance();
-            MessageBox.Show("Resistance: " + value); // debug
+            resultsToFiles.Add("resistance: " + value);
             result_label.Text = $"Resistance: {value}";
+        }
+
+        private void csv_button_Click(object sender, EventArgs e)
+        {
+            saving();
+        }
+
+        public void saving()
+        {
+            DateTime actualdate = DateTime.Now;
+            string actualdatestring = actualdate.ToString("d");
+           
+            string path = "C:\\Users\\akabe\\Desktop\\rigolProgram\\text.txt";
+            //File.WriteAllLines(path, resultsToFiles);
+            using (StreamWriter writer = new StreamWriter(path, append: true))
+            {
+                writer.WriteLine(resultsToFiles.Last());
+            }
         }
     }
 }

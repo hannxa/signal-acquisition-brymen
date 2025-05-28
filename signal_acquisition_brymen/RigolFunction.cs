@@ -3,6 +3,9 @@ using System.IO.Ports;
 
 namespace signal_acquisition_brymen
 {
+    /// <summary>
+    /// Zapis do csv, wywalic czestotliwosc, wykres np z 10 wartosci
+    /// </summary>
     public class RigolFunction
     {
         private SerialPort _port;
@@ -31,7 +34,6 @@ namespace signal_acquisition_brymen
         {
             try
             {
-                MessageBox.Show("Wejście w funkcję GetVoltageDC()"); // debug
 
                 _port.DiscardInBuffer();
                 _port.WriteLine(":MEASure:VOLTage:DC?");
@@ -39,7 +41,6 @@ namespace signal_acquisition_brymen
 
                 string response = _port.ReadLine().Trim();
 
-                MessageBox.Show("Odpowiedź z urządzenia: " + response); // debug
 
                 return response;
             }
@@ -56,14 +57,10 @@ namespace signal_acquisition_brymen
         {
             try
             {
-                MessageBox.Show("Wejście w funkcję GetVoltageAC()");
-                string response = _port.ReadExisting();
-                MessageBox.Show("Surowa odpowiedź: [" + response + "]");
-                /*_port.DiscardInBuffer();
+                _port.DiscardInBuffer();
                 _port.WriteLine(":MEASure:VOLTage:AC?");
                 System.Threading.Thread.Sleep(300);
                 string response = _port.ReadLine().Trim();
-                MessageBox.Show("Odpowiedź z urządzenia: " + response);*/
                 return response;
             }
             catch (Exception ex)
@@ -77,12 +74,10 @@ namespace signal_acquisition_brymen
         {
             try
             {
-                MessageBox.Show("Wejście w funkcję GetResistance()");
                 _port.DiscardInBuffer();
                 _port.WriteLine(":MEASure:RESistance?");
                 System.Threading.Thread.Sleep(300);
                 string response = _port.ReadLine().Trim();
-                MessageBox.Show("Odpowiedź z urządzenia: " + response);
                 return response;
             }
             catch (Exception ex)
@@ -96,12 +91,10 @@ namespace signal_acquisition_brymen
         {
             try
             {
-                MessageBox.Show("Wejście w funkcję GetResistance()");
                 _port.DiscardInBuffer();
                 _port.WriteLine(":MEASure:CURRent:DC?");
                 System.Threading.Thread.Sleep(300);
                 string response = _port.ReadLine().Trim();
-                MessageBox.Show("Odpowiedź z urządzenia: " + response);
                 return response;
             }
             catch (Exception ex)
@@ -109,19 +102,15 @@ namespace signal_acquisition_brymen
                 MessageBox.Show("Błąd: " + ex.Message);
                 return $"Błąd: {ex.Message}";
             }
-
-
         }
         public string GetCapacitance()
         {
             try
             {
-                MessageBox.Show("Wejście w funkcję GetCapacitance()");
                 _port.DiscardInBuffer();
                 _port.WriteLine(":MEASure:CAPacitance?");
                 System.Threading.Thread.Sleep(300);
                 string response = _port.ReadLine().Trim();
-                MessageBox.Show("Odpowiedź z urządzenia: " + response);
                 return response;
             }
             catch (Exception ex)
