@@ -27,52 +27,44 @@ namespace signal_acquisition_brymen
             }
         }
 
-        private void dc_v_button_Click(object sender, EventArgs e)
-        {
-            string value = _rigolFunction.GetVoltageDC();
-            Console.WriteLine("V:" + value);
-            result_label.Text = $"DC Voltage: {value}";
-        }
-
-        private void ac_v_button_Click(object sender, EventArgs e)
-        {
-
-            string value = _rigolFunction.GetVoltageAC();
-            result_label.Text = $"AC Voltage: {value}";
-            Console.WriteLine("AC Voltage", value);
-
-        }
-
-        private void dc_i_button_Click(object sender, EventArgs e)
-        {
-            string value = _rigolFunction.GetCurrentDC();
-            result_label.Text = $"DC Current: {value}";
-        }
-
-        private void ac_i_button_Click(object sender, EventArgs e)
-        {
-            string value = _rigolFunction.GetCurrentAC();
-            result_label.Text = $"AC Current: {value}";
-        }
-
-        private void resistance_button_Click(object sender, EventArgs e)
-        {
-            string value = _rigolFunction.GetResistance();
-            result_label.Text = $"Resistance: {value}";
-        }
-
-        private void capacitance_button_Click(object sender, EventArgs e)
-        {
-            string value = _rigolFunction.GetCapacitance();
-            result_label.Text = $"Capacitance: {value}";
-        }
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (_serialPort.IsOpen)
             {
                 _serialPort.Close();
             }
+        }
+
+        private void v_button_Click_1(object sender, EventArgs e)
+        {
+            MessageBox.Show("wejscie w funkcje: "); // debug
+            string value = _rigolFunction.GetVoltageDC();
+            MessageBox.Show("DC Voltage odpowiedź: " + value); // debug
+            result_label.Text = $"DC Voltage: {value}";
+        }
+
+        private void ac_button_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("wejscie w funkcje: "); // debug
+            string value = _rigolFunction.GetVoltageAC();
+            MessageBox.Show("DC Voltage odpowiedź: " + value); // debug
+            result_label.Text = $"DC Voltage: {value}";
+        }
+
+        private void I_button_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("wejscie w funkcje: "); // debug
+            string value = _rigolFunction.GetCurrent();
+            MessageBox.Show("DC current odpowiedź: " + value); // debug
+            result_label.Text = $"DC current: {value}";
+        }
+
+        private void Ω_button_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("wejscie w funkcje: "); // debug
+            string value = _rigolFunction.GetResistance();
+            MessageBox.Show("Resistance: " + value); // debug
+            result_label.Text = $"Resistance: {value}";
         }
     }
 }

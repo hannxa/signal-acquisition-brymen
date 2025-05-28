@@ -75,6 +75,7 @@
             v_button.Text = "V";
             v_button.TextAlign = ContentAlignment.MiddleRight;
             v_button.UseVisualStyleBackColor = true;
+            v_button.Click += v_button_Click_1;
             // 
             // Ω_button
             // 
@@ -84,6 +85,7 @@
             Ω_button.TabIndex = 6;
             Ω_button.Text = "Ω";
             Ω_button.UseVisualStyleBackColor = true;
+            Ω_button.Click += Ω_button_Click;
             // 
             // I_button
             // 
@@ -93,6 +95,7 @@
             I_button.TabIndex = 7;
             I_button.Text = "I";
             I_button.UseVisualStyleBackColor = true;
+            I_button.Click += I_button_Click;
             // 
             // ac_button
             // 
@@ -103,6 +106,7 @@
             ac_button.Text = "~V";
             ac_button.TextAlign = ContentAlignment.MiddleRight;
             ac_button.UseVisualStyleBackColor = true;
+            ac_button.Click += ac_button_Click;
             // 
             // feedback_label
             // 

@@ -27,11 +27,109 @@ namespace signal_acquisition_brymen
             }
         }
 
-        public string GetVoltageDC() => Query(":MEASure:VOLTage:DC?");
-        public string GetVoltageAC() => Query(":MEASure:VOLTage:AC?");
-        public string GetCurrentDC() => Query(":MEASure:CURRent:DC?");
-        public string GetCurrentAC() => Query(":MEASure:CURRent:AC?");
-        public string GetResistance() => Query(":MEASure:RESistance?");
-        public string GetCapacitance() => Query(":MEASure:CAPacitance?");
+        public string GetVoltageDC()
+        {
+            try
+            {
+                MessageBox.Show("Wejście w funkcję GetVoltageDC()"); // debug
+
+                _port.DiscardInBuffer();
+                _port.WriteLine(":MEASure:VOLTage:DC?");
+                System.Threading.Thread.Sleep(300); // Daj Rigolowi czas na odpowiedź
+
+                string response = _port.ReadLine().Trim();
+
+                MessageBox.Show("Odpowiedź z urządzenia: " + response); // debug
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd: " + ex.Message); // debug
+                return $"Błąd: {ex.Message}";
+            }
+        }
+
+
+
+        public string GetVoltageAC()
+        {
+            try
+            {
+                MessageBox.Show("Wejście w funkcję GetVoltageAC()");
+                string response = _port.ReadExisting();
+                MessageBox.Show("Surowa odpowiedź: [" + response + "]");
+                /*_port.DiscardInBuffer();
+                _port.WriteLine(":MEASure:VOLTage:AC?");
+                System.Threading.Thread.Sleep(300);
+                string response = _port.ReadLine().Trim();
+                MessageBox.Show("Odpowiedź z urządzenia: " + response);*/
+                return response;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd: " + ex.Message);
+                return $"Błąd: {ex.Message}";
+            }
+        }
+
+        public string GetResistance()
+        {
+            try
+            {
+                MessageBox.Show("Wejście w funkcję GetResistance()");
+                _port.DiscardInBuffer();
+                _port.WriteLine(":MEASure:RESistance?");
+                System.Threading.Thread.Sleep(300);
+                string response = _port.ReadLine().Trim();
+                MessageBox.Show("Odpowiedź z urządzenia: " + response);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd: " + ex.Message);
+                return $"Błąd: {ex.Message}";
+            }
+        }
+
+        public string GetCurrent()
+        {
+            try
+            {
+                MessageBox.Show("Wejście w funkcję GetResistance()");
+                _port.DiscardInBuffer();
+                _port.WriteLine(":MEASure:CURRent:DC?");
+                System.Threading.Thread.Sleep(300);
+                string response = _port.ReadLine().Trim();
+                MessageBox.Show("Odpowiedź z urządzenia: " + response);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd: " + ex.Message);
+                return $"Błąd: {ex.Message}";
+            }
+
+
+        }
+        public string GetCapacitance()
+        {
+            try
+            {
+                MessageBox.Show("Wejście w funkcję GetCapacitance()");
+                _port.DiscardInBuffer();
+                _port.WriteLine(":MEASure:CAPacitance?");
+                System.Threading.Thread.Sleep(300);
+                string response = _port.ReadLine().Trim();
+                MessageBox.Show("Odpowiedź z urządzenia: " + response);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd: " + ex.Message);
+                return $"Błąd: {ex.Message}";
+            }
+        }
+    
     }
 }
