@@ -12,39 +12,26 @@ namespace signal_acquisition_brymen
             _port = port;
         }
 
-        public string GetVoltageDC()
+        private string Query(string command)
         {
-            Console.WriteLine("Voltage function");
-            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
-            _port.WriteLine(":MEASure:VOLTage:DC?");
-            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
-        }
-        public string GetVoltageAC()
-        {
-            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
-            _port.WriteLine(":MEASure:VOLTage:AC?");
-            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
-        }
-
-        public string GetCurrentDC()
-        {
-            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
-            _port.WriteLine(":MEASure:CURRent:DC?");
-            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
-        }
-        public string GetCurrentAC()
-        {
-            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
-            _port.WriteLine(":MEASure:CURRent:AC?");
-            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
+            try
+            {
+                _port.DiscardInBuffer();
+                _port.WriteLine(command);
+                System.Threading.Thread.Sleep(300); // Rigol potrzebuje czasu
+                return _port.ReadLine().Trim();
+            }
+            catch (Exception ex)
+            {
+                return $"Błąd: {ex.Message}";
+            }
         }
 
-        /// bledne
-        public string GetResistance()
-        {
-            _port.DiscardInBuffer(); // czyścimy bufor przed zapytaniem
-            _port.WriteLine(":MEASure:RESistance?");
-            return _port.ReadLine().Trim(); // od razu odczytujemy odpowiedź
-        }
+        public string GetVoltageDC() => Query(":MEASure:VOLTage:DC?");
+        public string GetVoltageAC() => Query(":MEASure:VOLTage:AC?");
+        public string GetCurrentDC() => Query(":MEASure:CURRent:DC?");
+        public string GetCurrentAC() => Query(":MEASure:CURRent:AC?");
+        public string GetResistance() => Query(":MEASure:RESistance?");
+        public string GetCapacitance() => Query(":MEASure:CAPacitance?");
     }
 }

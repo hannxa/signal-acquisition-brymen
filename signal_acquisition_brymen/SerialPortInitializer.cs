@@ -7,17 +7,9 @@ namespace signal_acquisition_brymen
     {
         public SerialPort Port { get; private set; }
 
-        public SerialPortInitializer(string portName = "COM1")
+        public SerialPortInitializer(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits)
         {
-            Port = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
-            Port.DataReceived += Port_DataReceived;
-            Port.Open();
-        }
-
-        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            string data = Port.ReadExisting();
-            Console.WriteLine($"[DATA RECEIVED]: {data}");
+            Port = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
         }
     }
 }
