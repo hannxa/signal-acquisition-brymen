@@ -43,13 +43,22 @@
 
             ((System.ComponentModel.ISupportInitialize)measurementDurationSlider).BeginInit();
             SuspendLayout();
+<<<<<<< HEAD
 
+=======
+            button1 = new Button();
+            motionCanvas1 = new LiveChartsCore.SkiaSharpView.WinForms.MotionCanvas();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
+            SuspendLayout();
+            // 
+>>>>>>> 51bbf6d2796c4517bd2e81122eb6164ac5282228
             // result_label
             result_label.AutoSize = true;
             result_label.Location = new Point(159, 278);
             result_label.Name = "result_label";
             result_label.Size = new Size(46, 20);
             result_label.Text = "wynik";
+<<<<<<< HEAD
 
             // durationLabel
             durationLabel.AutoSize = true;
@@ -66,6 +75,26 @@
             measurementDurationSlider.Value = 10;
             measurementDurationSlider.ValueChanged += measurementDurationSlider_ValueChanged;
 
+=======
+            // 
+            // trackBar1
+            // 
+            trackBar1.Location = new Point(519, 125);
+            trackBar1.Name = "trackBar1";
+            trackBar1.Size = new Size(130, 56);
+            trackBar1.TabIndex = 3;
+            // 
+            // label2
+            // 
+            
+            label2.AutoSize = true;
+            label2.Location = new Point(519, 76);
+            label2.Name = "label2";
+            label2.Size = new Size(152, 20);
+            label2.TabIndex = 4;
+            label2.Text = "wybierz czas pomiaru";
+            // 
+>>>>>>> 51bbf6d2796c4517bd2e81122eb6164ac5282228
             // v_button
             v_button.Location = new Point(64, 78);
             v_button.Name = "v_button";
@@ -154,8 +183,41 @@
             ((System.ComponentModel.ISupportInitialize)measurementDurationSlider).EndInit();
             ResumeLayout(false);
             PerformLayout();
+            // 
+            // button1
+            // 
+            button1.Location = new Point(443, 142);
+            button1.Name = "button1";
+            button1.Size = new Size(199, 23);
+            button1.TabIndex = 12;
+            button1.Text = "start";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // motionCanvas1
+            // 
+            motionCanvas1.Location = new Point(56, 252);
+            motionCanvas1.Name = "motionCanvas1";
+            motionCanvas1.Size = new Size(440, 236);
+            motionCanvas1.TabIndex = 13;
         }
 
         #endregion
+<<<<<<< HEAD
+=======
+
+        private Label result_label;
+        private TrackBar trackBar1;
+        private Label label2;
+        private Button v_button;
+        private Button Ω_button;
+        private Button I_button;
+        private Button ac_button;
+        private Label feedback_label;
+        private Button csv_button;
+        private Button capacitance_button;
+        private Button button1;
+        private LiveChartsCore.SkiaSharpView.WinForms.MotionCanvas motionCanvas1;
+>>>>>>> 51bbf6d2796c4517bd2e81122eb6164ac5282228
     }
 }

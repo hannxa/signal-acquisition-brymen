@@ -240,6 +240,67 @@ namespace signal_acquisition_brymen
         {
             SaveToCsv();
         }
+        
+         private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            feedback_label.Text = $"Czas pomiaru: {trackBar1.Value} s";
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            int seconds = trackBar1.Value;
+            feedback_label.Text = $"Pomiar przez {seconds} sekund...";
+            result_label.Text = "";
+            _measurementValues.Clear();
+            _series.Values = _measurementValues;
+            motionCanvas1.Update();
+
+            var endTime = DateTime.Now.AddSeconds(seconds);
+            int t = 0;
+
+            while (DateTime.Now < endTime)
+            {
+                string valueStr = _selectedMeasurement switch
+                {
+                    MeasurementType.VoltageDC => _rigolFunction.GetVoltageDC(),
+                    MeasurementType.VoltageAC => _rigolFunction.GetVoltageAC(),
+                    MeasurementType.CurrentDC => _rigolFunction.GetCurrentDC(),
+                    MeasurementType.CurrentAC => _rigolFunction.GetCurrentAC(),
+                    MeasurementType.Resistance => _rigolFunction.GetResistance(),
+                    _ => "0"
+                };
+
+                string label = _selectedMeasurement switch
+                {
+                    MeasurementType.VoltageDC => "DC Voltage",
+                    MeasurementType.VoltageAC => "AC Voltage",
+                    MeasurementType.CurrentDC => "DC Current",
+                    MeasurementType.CurrentAC => "AC Current",
+                    MeasurementType.Resistance => "Resistance",
+                    _ => "Unknown"
+                };
+
+                // Próbujemy sparsować wartość do double
+                if (double.TryParse(valueStr.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double value))
+                {
+                    _measurementValues.Add(value);
+                }
+                else
+                {
+                    _measurementValues.Add(0);
+                }
+
+                result_label.Text = $"{_selectedMeasurement}: {valueStr}";
+                motionCanvas1.Update();
+                t++;
+
+                await Task.Delay(1000); // odczyt co 1 sekundę
+            }
+
+            feedback_label.Text = $"Pomiar zakończony ({seconds} s)";
+            motionCanvas1.Update(); // odśwież wykres po zakończeniu
+        }
+
 
         private void SaveToCsv()
         {
