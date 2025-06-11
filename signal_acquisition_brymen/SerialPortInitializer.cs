@@ -7,7 +7,7 @@ namespace signal_acquisition_brymen
     {
         public SerialPort Port { get; private set; }
 
-        public SerialPortInitializer(string portName = "COM13")
+        public SerialPortInitializer(string portName = "COM20")
         {
             Console.WriteLine($"[DEBUG] SerialPortInitializer constructor called for port: {portName}");
             Port = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);

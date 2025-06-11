@@ -6,6 +6,15 @@ using LiveChartsCore.SkiaSharpView.WinForms;
 
 namespace signal_acquisition_brymen
 {
+
+    /*
+     * 
+     * to do list:
+     * - wykres aktualny
+     * - dokumentacja
+     * 
+     */
+
     public partial class Form1 : Form
     {
         private SerialPort _serialPort;
@@ -38,7 +47,7 @@ namespace signal_acquisition_brymen
 
             try
             {
-                _serialPort = new SerialPort("COM13", 9600, Parity.None, 8, StopBits.One);
+                _serialPort = new SerialPort("COM20", 9600, Parity.None, 8, StopBits.One);
                 _serialPort.Open();
 
                 _rigolFunction = new RigolFunction(_serialPort);
