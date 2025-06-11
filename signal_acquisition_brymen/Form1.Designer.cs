@@ -41,6 +41,10 @@
             capacitance_button = new Button();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             SuspendLayout();
+            button1 = new Button();
+            motionCanvas1 = new LiveChartsCore.SkiaSharpView.WinForms.MotionCanvas();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
+            SuspendLayout();
             // 
             // result_label
             // 
@@ -60,6 +64,7 @@
             // 
             // label2
             // 
+            
             label2.AutoSize = true;
             label2.Location = new Point(519, 76);
             label2.Name = "label2";
@@ -159,6 +164,23 @@
             ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ResumeLayout(false);
             PerformLayout();
+            // 
+            // button1
+            // 
+            button1.Location = new Point(443, 142);
+            button1.Name = "button1";
+            button1.Size = new Size(199, 23);
+            button1.TabIndex = 12;
+            button1.Text = "start";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // motionCanvas1
+            // 
+            motionCanvas1.Location = new Point(56, 252);
+            motionCanvas1.Name = "motionCanvas1";
+            motionCanvas1.Size = new Size(440, 236);
+            motionCanvas1.TabIndex = 13;
         }
 
         #endregion
@@ -173,5 +195,7 @@
         private Label feedback_label;
         private Button csv_button;
         private Button capacitance_button;
+        private Button button1;
+        private LiveChartsCore.SkiaSharpView.WinForms.MotionCanvas motionCanvas1;
     }
 }
