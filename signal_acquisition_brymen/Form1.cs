@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Text;
-using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
-using ScottPlot;
-using ScottPlot.WinForms;
+using System.Windows.Forms;
 
 namespace signal_acquisition_brymen
 {
@@ -14,7 +13,7 @@ namespace signal_acquisition_brymen
     {
         private SerialPort _serialPort;
         private RigolFunction _rigolFunction;
-        private StringBuilder _csvData = new StringBuilder();
+        private StringBuilder _csvData = new();
         private CancellationTokenSource _measurementCts;
         private bool _isMeasuring = false;
         private string _currentMeasurementType = "Voltage DC";
@@ -27,7 +26,6 @@ namespace signal_acquisition_brymen
         {
             InitializeComponent();
             InitializePort();
-            //InitializeScottPlot();
         }
 
         private void InitializePort()
@@ -50,31 +48,6 @@ namespace signal_acquisition_brymen
             }
         }
 
-        //private void InitializeScottPlot()
-        //{
-        //    formsPlot1 = new FormsPlot
-        //    {
-        //        Location = new System.Drawing.Point(50, 300),
-        //        Size = new System.Drawing.Size(600, 200)
-        //    };
-        //    Controls.Add(formsPlot1);
-        //    formsPlot1.Plot.Title("Pomiar w czasie");
-        //    formsPlot1.Plot.XLabel("Czas (s)");
-        //    formsPlot1.Plot.YLabel("Wartość");
-        //    formsPlot1.Refresh();
-        //}
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            StopMeasurement();
-            _rigolFunction?.Dispose();
-            if (_serialPort?.IsOpen == true)
-            {
-                _serialPort.Close();
-                _serialPort.Dispose();
-            }
-        }
-
         private void measurementDurationSlider_ValueChanged(object sender, EventArgs e)
         {
             durationLabel.Text = $"Czas pomiaru: {measurementDurationSlider.Value} s";
@@ -93,7 +66,6 @@ namespace signal_acquisition_brymen
             feedback_label.Text = "Pomiar w toku...";
             values.Clear();
             times.Clear();
-            //formsPlot1.Plot.Clear();
             startTime = DateTime.Now;
 
             int durationSeconds = measurementDurationSlider.Value;
@@ -114,8 +86,24 @@ namespace signal_acquisition_brymen
             finally
             {
                 _isMeasuring = false;
-                startMeasurementButton.Text = "Start";
+                startMeasurementButton.Text = "Start Measurement";
             }
+        }
+
+        private async void singleMeasurementButton_Click(object sender, EventArgs e)
+        {
+            string value = await Task.Run(() => GetMeasurementValue(_currentMeasurementType));
+
+            this.Invoke((MethodInvoker)delegate {
+                if (value.StartsWith("Błąd:"))
+                {
+                    feedback_label.Text = value;
+                }
+                else
+                {
+                    result_label.Text = $"{_currentMeasurementType}: {value}";
+                }
+            });
         }
 
         private void PerformContinuousMeasurement(int durationSeconds, CancellationToken ct)
@@ -142,10 +130,6 @@ namespace signal_acquisition_brymen
                     {
                         values.Add(numericValue);
                         times.Add(elapsedSec);
-
-                        //formsPlot1.Plot.Clear();
-                        //formsPlot1.Plot.AddScatter(times.ToArray(), values.ToArray());
-                        //formsPlot1.Render();
                     }
                 });
 
@@ -162,178 +146,88 @@ namespace signal_acquisition_brymen
 
         private string GetMeasurementValue(string measurementType)
         {
-            try
+            return measurementType switch
             {
-                return measurementType switch
-                {
-                    "Voltage DC" => _rigolFunction.GetVoltageDC(),
-                    "Voltage AC" => _rigolFunction.GetVoltageAC(),
-                    "Current" => _rigolFunction.GetCurrent(),
-                    "Resistance" => _rigolFunction.GetResistance(),
-                    "Capacitance" => _rigolFunction.GetCapacitance(),
-                    _ => _rigolFunction.GetVoltageDC(),
-                };
-            }
-            catch (Exception ex)
-            {
-                return $"Błąd pomiaru: {ex.Message}";
-            }
+                "Voltage DC" => _rigolFunction.GetVoltageDC(),
+                "Voltage AC" => _rigolFunction.GetVoltageAC(),
+                "Current" => _rigolFunction.GetCurrent(),
+                "Resistance" => _rigolFunction.GetResistance(),
+                "Capacitance" => _rigolFunction.GetCapacitance(),
+                _ => _rigolFunction.GetVoltageDC(),
+            };
         }
 
         private void StopMeasurement()
         {
             _measurementCts?.Cancel();
-            _measurementCts?.Dispose();
-            _measurementCts = null;
+            _isMeasuring = false;
+            startMeasurementButton.Text = "Start Measurement";
+            feedback_label.Text = "Pomiar zatrzymany";
         }
 
-        private void v_button_Click_1(object sender, EventArgs e)
+        private async void v_button_Click_1(object sender, EventArgs e)
         {
             _currentMeasurementType = "Voltage DC";
-            if (_isMeasuring) return;
-            TakeSingleMeasurement();
-        }
+            string val = await Task.Run(() => _rigolFunction.GetVoltageDC());
 
-        private void ac_button_Click(object sender, EventArgs e)
-        {
-            _currentMeasurementType = "Voltage AC";
-            if (_isMeasuring) return;
-            TakeSingleMeasurement();
-        }
-
-        private void I_button_Click(object sender, EventArgs e)
-        {
-            _currentMeasurementType = "Current";
-            if (_isMeasuring) return;
-            TakeSingleMeasurement();
-        }
-
-        private void Ω_button_Click(object sender, EventArgs e)
-        {
-            _currentMeasurementType = "Resistance";
-            if (_isMeasuring) return;
-            TakeSingleMeasurement();
-        }
-
-        private void capacitance_button_Click(object sender, EventArgs e)
-        {
-            _currentMeasurementType = "Capacitance";
-            if (_isMeasuring) return;
-            TakeSingleMeasurement();
-        }
-
-        private void TakeSingleMeasurement()
-        {
-            Task.Run(() =>
-            {
-                string value = GetMeasurementValue(_currentMeasurementType);
-                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                this.Invoke((MethodInvoker)delegate {
-                    _csvData.AppendLine($"{_currentMeasurementType};{value};{timestamp}");
-                    result_label.Text = $"{_currentMeasurementType}: {value}";
-                });
+            this.Invoke((MethodInvoker)delegate {
+                result_label.Text = $"{_currentMeasurementType}: {val}";
             });
         }
 
+        private async void ac_button_Click(object sender, EventArgs e)
+        {
+            _currentMeasurementType = "Voltage AC";
+            string val = await Task.Run(() => _rigolFunction.GetVoltageAC());
+
+            this.Invoke((MethodInvoker)delegate {
+                result_label.Text = $"{_currentMeasurementType}: {val}";
+            });
+        }
+
+        private async void I_button_Click(object sender, EventArgs e)
+        {
+            _currentMeasurementType = "Current";
+            string val = await Task.Run(() => _rigolFunction.GetCurrent());
+
+            this.Invoke((MethodInvoker)delegate {
+                result_label.Text = $"{_currentMeasurementType}: {val}";
+            });
+        }
+
+        private async void Ω_button_Click(object sender, EventArgs e)
+        {
+            _currentMeasurementType = "Resistance";
+            string val = await Task.Run(() => _rigolFunction.GetResistance());
+            if (!val.StartsWith("Błąd:"))
+                result_label.Text = $"{_currentMeasurementType}: {val}";
+            else
+                feedback_label.Text = val;
+        }
+
+        private async void capacitance_button_Click(object sender, EventArgs e)
+        {
+            _currentMeasurementType = "Capacitance";
+            string val = await Task.Run(() => _rigolFunction.GetCapacitance());
+
+            this.Invoke((MethodInvoker)delegate {
+                result_label.Text = $"{_currentMeasurementType}: {val}";
+            });
+        }
+
+
         private void csv_button_Click(object sender, EventArgs e)
         {
-            SaveToCsv();
-        }
-        
-         private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            feedback_label.Text = $"Czas pomiaru: {trackBar1.Value} s";
-        }
-
-        private async void button1_Click(object sender, EventArgs e)
-        {
-            int seconds = trackBar1.Value;
-            feedback_label.Text = $"Pomiar przez {seconds} sekund...";
-            result_label.Text = "";
-            _measurementValues.Clear();
-            _series.Values = _measurementValues;
-            motionCanvas1.Update();
-
-            var endTime = DateTime.Now.AddSeconds(seconds);
-            int t = 0;
-
-            while (DateTime.Now < endTime)
+            try
             {
-                string valueStr = _selectedMeasurement switch
-                {
-                    MeasurementType.VoltageDC => _rigolFunction.GetVoltageDC(),
-                    MeasurementType.VoltageAC => _rigolFunction.GetVoltageAC(),
-                    MeasurementType.CurrentDC => _rigolFunction.GetCurrentDC(),
-                    MeasurementType.CurrentAC => _rigolFunction.GetCurrentAC(),
-                    MeasurementType.Resistance => _rigolFunction.GetResistance(),
-                    _ => "0"
-                };
-
-                string label = _selectedMeasurement switch
-                {
-                    MeasurementType.VoltageDC => "DC Voltage",
-                    MeasurementType.VoltageAC => "AC Voltage",
-                    MeasurementType.CurrentDC => "DC Current",
-                    MeasurementType.CurrentAC => "AC Current",
-                    MeasurementType.Resistance => "Resistance",
-                    _ => "Unknown"
-                };
-
-                // Próbujemy sparsować wartość do double
-                if (double.TryParse(valueStr.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double value))
-                {
-                    _measurementValues.Add(value);
-                }
-                else
-                {
-                    _measurementValues.Add(0);
-                }
-
-                result_label.Text = $"{_selectedMeasurement}: {valueStr}";
-                motionCanvas1.Update();
-                t++;
-
-                await Task.Delay(1000); // odczyt co 1 sekundę
+                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string filePath = Path.Combine(desktopPath, "measurement.csv");
+                File.WriteAllText(filePath, _csvData.ToString());
+                feedback_label.Text = "Zapisano do CSV";
             }
-
-            feedback_label.Text = $"Pomiar zakończony ({seconds} s)";
-            motionCanvas1.Update(); // odśwież wykres po zakończeniu
-        }
-
-
-        private void SaveToCsv()
-        {
-            if (_csvData.Length == 0)
+            catch (Exception ex)
             {
-                MessageBox.Show("Brak danych do zapisania!");
-                return;
-            }
-
-            using (var saveDialog = new SaveFileDialog())
-            {
-                saveDialog.Filter = "CSV files (*.csv)|*.csv";
-                saveDialog.DefaultExt = "csv";
-                saveDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                saveDialog.FileName = $"rigol_measurements_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-
-                if (saveDialog.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        using (StreamWriter writer = new StreamWriter(saveDialog.FileName, append: false, Encoding.UTF8))
-                        {
-                            writer.WriteLine("Typ pomiaru;Wartość;Czas");
-                            writer.Write(_csvData.ToString());
-                        }
-                        _csvData.Clear();
-                        MessageBox.Show("Zapisano dane do pliku CSV!");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Błąd zapisu: {ex.Message}");
-                    }
-                }
+                feedback_label.Text = "Błąd zapisu CSV: " + ex.Message;
             }
         }
     }
