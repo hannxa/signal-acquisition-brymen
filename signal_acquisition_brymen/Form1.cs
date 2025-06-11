@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Generic;
 using ScottPlot;
 using ScottPlot.WinForms;
 
@@ -19,15 +20,17 @@ namespace signal_acquisition_brymen
         private bool _isMeasuring = false;
         private string _currentMeasurementType = "Voltage DC";
 
-        private List<double> values = new();
-        private List<double> times = new();
+        // Listy do przechowywania danych pomiarowych
+        private List<double> measurementValues = new List<double>();
+        private List<double> measurementTimes = new List<double>();
         private DateTime startTime;
+        private FormsPlot formsPlot1; // Zakładam, że masz ten kontroler na formie
 
         public Form1()
         {
             InitializeComponent();
             InitializePort();
-            //InitializeScottPlot();
+            InitializeScottPlot();
         }
 
         private void InitializePort()
@@ -50,19 +53,16 @@ namespace signal_acquisition_brymen
             }
         }
 
-        //private void InitializeScottPlot()
-        //{
-        //    formsPlot1 = new FormsPlot
-        //    {
-        //        Location = new System.Drawing.Point(50, 300),
-        //        Size = new System.Drawing.Size(600, 200)
-        //    };
-        //    Controls.Add(formsPlot1);
-        //    formsPlot1.Plot.Title("Pomiar w czasie");
-        //    formsPlot1.Plot.XLabel("Czas (s)");
-        //    formsPlot1.Plot.YLabel("Wartość");
-        //    formsPlot1.Refresh();
-        //}
+        private void InitializeScottPlot()
+        {
+            // Inicjalizacja wykresu - upewnij się, że formsPlot1 istnieje na formie
+            if (formsPlot1 != null)
+            {
+                formsPlot1.Plot.Title("Wykres pomiarów");
+                formsPlot1.Plot.XLabel("Czas (s)");
+                formsPlot1.Plot.YLabel("Wartość");
+            }
+        }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -80,6 +80,7 @@ namespace signal_acquisition_brymen
             durationLabel.Text = $"Czas pomiaru: {measurementDurationSlider.Value} s";
         }
 
+        // Główna funkcja do rozpoczęcia pomiaru ciągłego
         private async void startMeasurementButton_Click(object sender, EventArgs e)
         {
             if (_isMeasuring)
@@ -91,10 +92,11 @@ namespace signal_acquisition_brymen
             _isMeasuring = true;
             startMeasurementButton.Text = "Stop";
             feedback_label.Text = "Pomiar w toku...";
-            values.Clear();
-            times.Clear();
-            //formsPlot1.Plot.Clear();
-            startTime = DateTime.Now;
+
+            // Wyczyść poprzednie dane
+            measurementValues.Clear();
+            measurementTimes.Clear();
+            _csvData.Clear();
 
             int durationSeconds = measurementDurationSlider.Value;
             _measurementCts = new CancellationTokenSource();
@@ -120,42 +122,44 @@ namespace signal_acquisition_brymen
 
         private void PerformContinuousMeasurement(int durationSeconds, CancellationToken ct)
         {
-            DateTime endTime = DateTime.Now.AddSeconds(durationSeconds);
+            startTime = DateTime.Now;
+            DateTime endTime = startTime.AddSeconds(durationSeconds);
 
             while (DateTime.Now < endTime && !ct.IsCancellationRequested)
             {
-                string value = GetMeasurementValue(_currentMeasurementType);
+                string valueStr = GetMeasurementValue(_currentMeasurementType);
                 double elapsedSec = (DateTime.Now - startTime).TotalSeconds;
                 string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
 
                 this.Invoke((MethodInvoker)delegate {
-                    if (value.StartsWith("Błąd:"))
+                    if (valueStr.StartsWith("Błąd:"))
                     {
-                        feedback_label.Text = value;
+                        feedback_label.Text = valueStr;
                         return;
                     }
 
-                    _csvData.AppendLine($"{_currentMeasurementType};{value};{timestamp}");
-                    result_label.Text = $"{_currentMeasurementType}: {value}";
+                    // Dodaj do CSV
+                    _csvData.AppendLine($"{_currentMeasurementType};{valueStr};{timestamp}");
+                    result_label.Text = $"{_currentMeasurementType}: {valueStr}";
 
-                    if (double.TryParse(value, out double numericValue))
+                    // Sparsuj wartość i dodaj do list
+                    if (double.TryParse(valueStr.Replace(',', '.'),
+                        System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out double numericValue))
                     {
-                        values.Add(numericValue);
-                        times.Add(elapsedSec);
-
-                        //formsPlot1.Plot.Clear();
-                        //formsPlot1.Plot.AddScatter(times.ToArray(), values.ToArray());
-                        //formsPlot1.Render();
+                        measurementValues.Add(numericValue);
+                        measurementTimes.Add(elapsedSec);
                     }
                 });
 
-                Thread.Sleep(200);
+                Thread.Sleep(200); // Odczyt co 200ms
             }
 
             if (!ct.IsCancellationRequested)
             {
                 this.Invoke((MethodInvoker)delegate {
-                    feedback_label.Text = "Pomiar zakończony";
+                    feedback_label.Text = $"Pomiar zakończony. Zebrano {measurementValues.Count} próbek.";
                 });
             }
         }
@@ -187,6 +191,72 @@ namespace signal_acquisition_brymen
             _measurementCts = null;
         }
 
+        // Funkcja do wyświetlania wykresu
+        private void PlotMeasurements()
+        {
+            if (measurementValues.Count == 0 || measurementTimes.Count != measurementValues.Count)
+            {
+                MessageBox.Show("Brak danych do wyświetlenia na wykresie!");
+                return;
+            }
+
+            if (formsPlot1 == null)
+            {
+                MessageBox.Show("Kontrolka wykresu nie jest zainicjalizowana!");
+                return;
+            }
+
+            try
+            {
+                // Wyczyść poprzedni wykres
+                formsPlot1.Plot.Clear();
+
+                // Dodaj dane do wykresu
+                formsPlot1.Plot.AddScatter(
+                    measurementTimes.ToArray(),
+                    measurementValues.ToArray(),
+                    label: _currentMeasurementType
+                );
+
+                // Ustaw tytuły osi
+                formsPlot1.Plot.Title($"Wykres pomiarów - {_currentMeasurementType}");
+                formsPlot1.Plot.XLabel("Czas (s)");
+                formsPlot1.Plot.YLabel(GetYAxisLabel(_currentMeasurementType));
+
+                // Ustaw zakresy osi
+                formsPlot1.Plot.AxisAuto();
+
+                // Odśwież wykres
+                formsPlot1.Refresh();
+
+                feedback_label.Text = $"Wykres wyświetlony ({measurementValues.Count} punktów)";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd wyświetlania wykresu: {ex.Message}");
+            }
+        }
+
+        private string GetYAxisLabel(string measurementType)
+        {
+            return measurementType switch
+            {
+                "Voltage DC" => "Napięcie DC (V)",
+                "Voltage AC" => "Napięcie AC (V)",
+                "Current" => "Prąd (A)",
+                "Resistance" => "Opór (Ω)",
+                "Capacitance" => "Pojemność (F)",
+                _ => "Wartość"
+            };
+        }
+
+        // Przycisk do wyświetlania wykresu
+        private void plot_button_Click(object sender, EventArgs e)
+        {
+            PlotMeasurements();
+        }
+
+        // Przyciski wyboru typu pomiaru
         private void v_button_Click_1(object sender, EventArgs e)
         {
             _currentMeasurementType = "Voltage DC";
@@ -240,67 +310,6 @@ namespace signal_acquisition_brymen
         {
             SaveToCsv();
         }
-        
-         private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            feedback_label.Text = $"Czas pomiaru: {trackBar1.Value} s";
-        }
-
-        private async void button1_Click(object sender, EventArgs e)
-        {
-            int seconds = trackBar1.Value;
-            feedback_label.Text = $"Pomiar przez {seconds} sekund...";
-            result_label.Text = "";
-            _measurementValues.Clear();
-            _series.Values = _measurementValues;
-            motionCanvas1.Update();
-
-            var endTime = DateTime.Now.AddSeconds(seconds);
-            int t = 0;
-
-            while (DateTime.Now < endTime)
-            {
-                string valueStr = _selectedMeasurement switch
-                {
-                    MeasurementType.VoltageDC => _rigolFunction.GetVoltageDC(),
-                    MeasurementType.VoltageAC => _rigolFunction.GetVoltageAC(),
-                    MeasurementType.CurrentDC => _rigolFunction.GetCurrentDC(),
-                    MeasurementType.CurrentAC => _rigolFunction.GetCurrentAC(),
-                    MeasurementType.Resistance => _rigolFunction.GetResistance(),
-                    _ => "0"
-                };
-
-                string label = _selectedMeasurement switch
-                {
-                    MeasurementType.VoltageDC => "DC Voltage",
-                    MeasurementType.VoltageAC => "AC Voltage",
-                    MeasurementType.CurrentDC => "DC Current",
-                    MeasurementType.CurrentAC => "AC Current",
-                    MeasurementType.Resistance => "Resistance",
-                    _ => "Unknown"
-                };
-
-                // Próbujemy sparsować wartość do double
-                if (double.TryParse(valueStr.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double value))
-                {
-                    _measurementValues.Add(value);
-                }
-                else
-                {
-                    _measurementValues.Add(0);
-                }
-
-                result_label.Text = $"{_selectedMeasurement}: {valueStr}";
-                motionCanvas1.Update();
-                t++;
-
-                await Task.Delay(1000); // odczyt co 1 sekundę
-            }
-
-            feedback_label.Text = $"Pomiar zakończony ({seconds} s)";
-            motionCanvas1.Update(); // odśwież wykres po zakończeniu
-        }
-
 
         private void SaveToCsv()
         {
@@ -326,7 +335,6 @@ namespace signal_acquisition_brymen
                             writer.WriteLine("Typ pomiaru;Wartość;Czas");
                             writer.Write(_csvData.ToString());
                         }
-                        _csvData.Clear();
                         MessageBox.Show("Zapisano dane do pliku CSV!");
                     }
                     catch (Exception ex)
@@ -335,6 +343,20 @@ namespace signal_acquisition_brymen
                     }
                 }
             }
+        }
+
+        // Funkcja do czyszczenia danych (opcjonalna)
+        private void clearData_button_Click(object sender, EventArgs e)
+        {
+            measurementValues.Clear();
+            measurementTimes.Clear();
+            _csvData.Clear();
+            if (formsPlot1 != null)
+            {
+                formsPlot1.Plot.Clear();
+                formsPlot1.Refresh();
+            }
+            feedback_label.Text = "Dane wyczyszczone";
         }
     }
 }
