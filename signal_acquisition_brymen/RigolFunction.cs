@@ -1,38 +1,38 @@
-﻿using System;
-using System.IO.Ports;
+﻿using System.IO.Ports;
 
 namespace signal_acquisition_brymen
 {
     /// <summary>
-    /// Zapis do csv, wywalic czestotliwosc, wykres np z 10 wartosci
+    /// Handles communication with a Rigol device over SerialPort to acquire measurements.
     /// </summary>
     public class RigolFunction : IDisposable
     {
         private SerialPort _port;
         private bool _disposed = false;
 
+        // Constructor assigns externally managed SerialPort instance
         public RigolFunction(SerialPort port)
         {
             _port = port;
         }
 
+        // Measures and returns DC voltage
         public string GetVoltageDC()
         {
             try
             {
-                _port.DiscardInBuffer();
-                _port.WriteLine(":MEASure:VOLTage:DC?");
-                System.Threading.Thread.Sleep(300);
-                return _port.ReadLine().Trim();
+                _port.DiscardInBuffer();                      // Clear input buffer
+                _port.WriteLine(":MEASure:VOLTage:DC?");      // Send SCPI command
+                System.Threading.Thread.Sleep(300);           // Wait for response
+                return _port.ReadLine().Trim();               // Read and return response
             }
             catch (Exception ex)
             {
-                return $"Błąd: {ex.Message}";
+                return $"Błąd: {ex.Message}";                  // Return error
             }
         }
 
-
-
+        // Measures and returns AC voltage
         public string GetVoltageAC()
         {
             try
@@ -45,11 +45,12 @@ namespace signal_acquisition_brymen
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd: " + ex.Message);
+                MessageBox.Show("Błąd: " + ex.Message);       // Show error message
                 return $"Błąd: {ex.Message}";
             }
         }
 
+        // Measures and returns resistance
         public string GetResistance()
         {
             try
@@ -67,6 +68,7 @@ namespace signal_acquisition_brymen
             }
         }
 
+        // Measures and returns DC current
         public string GetCurrent()
         {
             try
@@ -83,6 +85,8 @@ namespace signal_acquisition_brymen
                 return $"Błąd: {ex.Message}";
             }
         }
+
+        // Measures and returns capacitance
         public string GetCapacitance()
         {
             try
@@ -100,12 +104,14 @@ namespace signal_acquisition_brymen
             }
         }
 
+        // IDisposable implementation
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        // Cleanup logic
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -117,6 +123,5 @@ namespace signal_acquisition_brymen
                 _disposed = true;
             }
         }
-    
     }
 }
